@@ -21,7 +21,7 @@
 #define FILTER_NAME "scale-set"
 #define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin\", " \
                        		"\"type\" : \"string\", " \
-			Massimiliano	"\"default\" : \"" FILTER_NAME "\" }, " \
+				"\"default\" : \"" FILTER_NAME "\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the scale filter.\", " \
 				"\"type\": \"boolean\", " \
