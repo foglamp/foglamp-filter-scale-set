@@ -28,14 +28,14 @@
 				"\"default\": \"false\" }, " \
 			"\"factors\" : {\"description\" : \"Scale factor and offset configuration.\", " \
 				"\"type\": \"JSON\", " \
-				"\"default\": \"\\\"factors\\\" : [" \
+				"\"default\": \"{ \\\"factors\\\" : [" \
 							"{ \\\"asset\\\" : \\\".*\\\", " \
 							"  \\\"datapoint\\\" : \\\".*\\\", " \
 							"  \\\"scale\\\" : \\\"1.0\\\", " \
 							"  \\\"offset\\\" : \\\"0.0\\\" " \
 							" }" \
 						"]" \
-			"\"} }"
+			"}\"} }"
 
 using namespace std;
 
