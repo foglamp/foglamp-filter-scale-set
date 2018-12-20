@@ -21,21 +21,22 @@
 #define FILTER_NAME "scale-set"
 #define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin\", " \
                        		"\"type\" : \"string\", " \
-				"\"default\" : \"" FILTER_NAME "\" }, " \
+				"\"default\" : \"" FILTER_NAME "\", \"readonly\":\"true\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the scale filter.\", " \
 				"\"type\": \"boolean\", " \
+				"\"displayName\" : \"Enable\", " \
 				"\"default\": \"false\" }, " \
 			"\"factors\" : {\"description\" : \"Scale factor and offset configuration.\", " \
 				"\"type\": \"JSON\", " \
-				"\"default\": \"\\\"factors\\\" : [" \
+				"\"default\": \"{ \\\"factors\\\" : [" \
 							"{ \\\"asset\\\" : \\\".*\\\", " \
 							"  \\\"datapoint\\\" : \\\".*\\\", " \
 							"  \\\"scale\\\" : \\\"1.0\\\", " \
 							"  \\\"offset\\\" : \\\"0.0\\\" " \
 							" }" \
-						"]" \
-			"\"} }"
+						"] }" \
+			"\", \"order\": \"1\", \"displayName\":\"Scale factors\"} }"
 
 using namespace std;
 
