@@ -19,7 +19,7 @@
 #include <scale_set_filter.h>
 
 #define FILTER_NAME "scale-set"
-#define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin\", " \
+#define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin, apply a set of per asset and datapoint scale factors and offsets\", " \
                        		"\"type\" : \"string\", " \
 				"\"default\" : \"" FILTER_NAME "\", \"readonly\":\"true\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
