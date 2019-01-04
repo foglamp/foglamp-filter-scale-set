@@ -90,8 +90,16 @@ Document	doc;
 						datapoint = (*it)["datapoint"].GetString();
 					if (it->HasMember("scale") && (*it)["scale"].IsFloat())
 						scale = (*it)["scale"].GetFloat();
-					if (it->HasMember("offset"))
+					else if (it->HasMember("scale") && (*it)["scale"].IsInt())
+						scale = (*it)["scale"].GetInt();
+					else if (it->HasMember("scale"))
+						Logger::getLogger()->error("Scale property for asset %s, %s shoud be a numeric value", asset.c_str(), datapoint.c_str());
+					if (it->HasMember("offset") && (*it)["offset"].IsFloat())
 						offset = (*it)["offset"].GetFloat();
+					else if (it->HasMember("offset") && (*it)["offset"].IsInt())
+						offset = (*it)["offset"].GetInt();
+					else if (it->HasMember("scale"))
+						Logger::getLogger()->error("Offset property for asset %s, %s shoud be a numeric value", asset.c_str(), datapoint.c_str());
 					m_scaleSet.push_back(new ScaleSet(asset, datapoint, scale, offset));
 				}
 			}
