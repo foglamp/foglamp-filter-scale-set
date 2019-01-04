@@ -90,8 +90,12 @@ Document	doc;
 						datapoint = (*it)["datapoint"].GetString();
 					if (it->HasMember("scale") && (*it)["scale"].IsFloat())
 						scale = (*it)["scale"].GetFloat();
-					if (it->HasMember("offset"))
+					if (it->HasMember("scale") && (*it)["scale"].IsInt())
+						scale = (*it)["scale"].GetInt();
+					if (it->HasMember("offset") && (*it)["offset"].IsFloat())
 						offset = (*it)["offset"].GetFloat();
+					if (it->HasMember("offset") && (*it)["offset"].IsInt())
+						offset = (*it)["offset"].GetInt();
 					m_scaleSet.push_back(new ScaleSet(asset, datapoint, scale, offset));
 				}
 			}
