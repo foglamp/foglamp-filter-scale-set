@@ -15,6 +15,7 @@
 #include <string>                 
 #include <vector>
 #include <regex>
+#include <mutex>
 
 /**
  * A FogLAMP filter that can apply a set of different scale and offset
@@ -29,6 +30,7 @@ class ScaleSetFilter : public FogLampFilter {
                         OUTPUT_STREAM out);
 		~ScaleSetFilter();
 		void	ingest(const std::vector<Reading *>& readings);
+		void	reconfigure(const std::string& conf);
 	private:
 		class ScaleSet {
 			public:
@@ -45,6 +47,7 @@ class ScaleSetFilter : public FogLampFilter {
 		};
 		void 			handleConfig(const ConfigCategory& conf);
 		std::vector<ScaleSet *>	m_scaleSet;
+		std::mutex		m_configMutex;
 };
 
 
