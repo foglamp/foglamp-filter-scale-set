@@ -42,13 +42,13 @@ factors
 
   { "factors" : [
        {
-         "asset"     : "enviroment",
+         "asset"     : "environment",
          "datapoint" : "temperature",
          "scale"     : 1.8,
          "offset"    : 32
        },
        {
-         "asset"     : "enviroment",
+         "asset"     : "environment",
          "datapoint" : "humidity",
          "scale"     : 0.1,
          "offset"    : 0
