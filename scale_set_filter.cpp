@@ -53,12 +53,29 @@ void ScaleSetFilter::ingest(const vector<Reading *>& readings)
 						      reading != readings.end();
 						      ++reading)
 	{
+		lock_guard<mutex> guard(m_configMutex);	// Pretect against reconfiguration
 		for (vector<ScaleSet *>::const_iterator it = m_scaleSet.cbegin();
 					it != m_scaleSet.cend(); it++)
 		{
 			(*it)->apply(*reading);
 		}
 	}
+}
+
+/**
+ * Reconfigure the filter. We must hold the mutex here to stop the ingest
+ * as we manipulate the m_scaleSet vector when recreating the scale sets
+ *
+ * @param conf		The new configuration to apply
+ */
+void ScaleSetFilter::reconfigure(const string& conf)
+{
+	lock_guard<mutex> guard(m_configMutex);
+	setConfig(conf);
+	for (auto it = m_scaleSet.cbegin(); it != m_scaleSet.cend(); it++)
+		delete *it;
+	m_scaleSet.clear();
+	handleConfig(m_config);
 }
 
 /**
