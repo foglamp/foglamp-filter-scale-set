@@ -17,6 +17,7 @@
 #include <iostream>
 #include <filter_plugin.h>
 #include <scale_set_filter.h>
+#include <version.h>
 
 #define FILTER_NAME "scale-set"
 #define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin, apply a set of per asset and datapoint scale factors and offsets\", " \
@@ -50,7 +51,7 @@ extern "C" {
  */
 static PLUGIN_INFORMATION info = {
         FILTER_NAME,              // Name
-        "1.0.0",                  // Version
+        VERSION,                  // Version
         0,                        // Flags
         PLUGIN_TYPE_FILTER,       // Type
         "1.0.0",                  // Interface version
