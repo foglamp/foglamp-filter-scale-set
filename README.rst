@@ -10,8 +10,51 @@ regular expression whcih is matches against the asset name of the reading
 in the asset. Optionally a datapoint regular expression may also be given,
 this is used to match the datapoint within a matching asset.
 
-Caution, if multiple regular expressions match a signle asset and datapoint
+Caution, if multiple regular expressions match a single asset and datapoint
 then *all* of the scale and offset values will be applied to the asset/datapoint.
+
+Configuration
+-------------
+
+The filter supports the following configuration items:
+
+enable
+  A switch to control if the filter should take effect or not
+
+factors
+  A JSON document which contains an array of scale factors to apply. Each
+  element in the arary is a JSON object with the following properties:
+
+  asset
+    A regular expression that should match the asset name
+
+  datapoint
+    A regular expression that should match the data point within the asset
+
+  scale
+    The scale factor to apply to the matching asset and data point
+
+  offset
+    An offset value to apply to the matching asset and data point
+
+
+.. code-block:: JSON
+
+  { "factors" : [
+       {
+         "asset"     : "environment",
+         "datapoint" : "temperature",
+         "scale"     : 1.8,
+         "offset"    : 32
+       },
+       {
+         "asset"     : "environment",
+         "datapoint" : "humidity",
+         "scale"     : 0.1,
+         "offset"    : 0
+       }
+    ]
+  }
 
 Build
 -----
@@ -83,17 +126,15 @@ This repo contains the scripts used to create a foglamp-filter-scale-set Debian 
 The make_deb script
 ===================
 
-Run the make_deb command after compiling the plugin:
+Run the make_deb:
 
 .. code-block:: console
 
   $ ./make_deb help
-  make_deb {x86|arm} [help|clean|cleanall]
+  make_deb [help|clean|cleanall]
   This script is used to create the Debian package of FoglAMP C++ 'scale-set' filter plugin
   Arguments:
    help     - Display this help text
-   x86      - Build an x86_64 package
-   arm      - Build an armv7l package
    clean    - Remove all the old versions saved in format .XXXX
    cleanall - Remove all the versions, including the last one
   $

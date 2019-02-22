@@ -17,25 +17,27 @@
 #include <iostream>
 #include <filter_plugin.h>
 #include <scale_set_filter.h>
+#include <version.h>
 
 #define FILTER_NAME "scale-set"
-#define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin\", " \
+#define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Scale filter plugin, apply a set of per asset and datapoint scale factors and offsets\", " \
                        		"\"type\" : \"string\", " \
-				"\"default\" : \"" FILTER_NAME "\" }, " \
+				"\"default\" : \"" FILTER_NAME "\", \"readonly\":\"true\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the scale filter.\", " \
 				"\"type\": \"boolean\", " \
+				"\"displayName\" : \"Enabled\", " \
 				"\"default\": \"false\" }, " \
 			"\"factors\" : {\"description\" : \"Scale factor and offset configuration.\", " \
 				"\"type\": \"JSON\", " \
-				"\"default\": \"\\\"factors\\\" : [" \
+				"\"default\": \"{ \\\"factors\\\" : [" \
 							"{ \\\"asset\\\" : \\\".*\\\", " \
 							"  \\\"datapoint\\\" : \\\".*\\\", " \
-							"  \\\"scale\\\" : \\\"1.0\\\", " \
-							"  \\\"offset\\\" : \\\"0.0\\\" " \
+							"  \\\"scale\\\" : 1.0, " \
+							"  \\\"offset\\\" : 0.0 " \
 							" }" \
-						"]" \
-			"\"} }"
+						"] }" \
+			"\", \"order\": \"1\", \"displayName\":\"Scale factors\"} }"
 
 using namespace std;
 
@@ -49,12 +51,18 @@ extern "C" {
  */
 static PLUGIN_INFORMATION info = {
         FILTER_NAME,              // Name
-        "1.0.0",                  // Version
+        VERSION,                  // Version
         0,                        // Flags
         PLUGIN_TYPE_FILTER,       // Type
         "1.0.0",                  // Interface version
 	DEFAULT_CONFIG	          // Default plugin configuration
 };
+
+typedef struct
+{
+	ScaleSetFilter	*handle;
+	std::string	configCatName;
+} FILTER_INFO;
 
 /**
  * Return the information about this plugin
@@ -78,12 +86,14 @@ PLUGIN_HANDLE plugin_init(ConfigCategory *config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output)
 {
-	ScaleSetFilter *handle = new ScaleSetFilter(FILTER_NAME,
-						  *config,
-						  outHandle,
-						  output);
+	FILTER_INFO *info = new FILTER_INFO;
+	info->handle = new ScaleSetFilter(FILTER_NAME,
+					*config,
+					outHandle,
+					output);
+	info->configCatName = config->getName();
 	
-	return (PLUGIN_HANDLE)handle;
+	return (PLUGIN_HANDLE)info;
 }
 
 /**
@@ -95,7 +105,9 @@ PLUGIN_HANDLE plugin_init(ConfigCategory *config,
 void plugin_ingest(PLUGIN_HANDLE *handle,
 		   READINGSET *readingSet)
 {
-	ScaleSetFilter *filter = (ScaleSetFilter *)handle;
+	FILTER_INFO *info = (FILTER_INFO *) handle;
+	ScaleSetFilter* filter = info->handle;
+	
 	if (!filter->isEnabled())
 	{
 		// Current filter is not active: just pass the readings set
@@ -103,8 +115,28 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 		return;
 	}
 
-	filter->ingest(((ReadingSet *)readingSet)->getAllReadings());
+	const vector<Reading *>& readings = ((ReadingSet *)readingSet)->getAllReadings();
+	filter->ingest(readings);
+	for (vector<Reading *>::const_iterator elem = readings.begin();
+						      elem != readings.end();
+						      ++elem)
+	{
+		AssetTracker::getAssetTracker()->addAssetTrackingTuple(info->configCatName, (*elem)->getAssetName(), string("Filter"));
+	}
 	filter->m_func(filter->m_data, readingSet);
+}
+
+/**
+ * Reconfigure the plugin
+ *
+ * @param handle	The plugin handle
+ * @param bewConfig	The new configuration
+ */
+void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig)
+{
+	FILTER_INFO *info = (FILTER_INFO *) handle;
+	ScaleSetFilter* scaleSet = info->handle;
+	scaleSet->reconfigure(newConfig);
 }
 
 /**
@@ -112,8 +144,9 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
  */
 void plugin_shutdown(PLUGIN_HANDLE *handle)
 {
-	ScaleSetFilter *filter = (ScaleSetFilter *)handle;
-	delete filter;
+	FILTER_INFO *info = (FILTER_INFO *) handle;
+	delete info->handle;
+	delete info;
 }
 
 };

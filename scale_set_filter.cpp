@@ -53,12 +53,29 @@ void ScaleSetFilter::ingest(const vector<Reading *>& readings)
 						      reading != readings.end();
 						      ++reading)
 	{
+		lock_guard<mutex> guard(m_configMutex);	// Pretect against reconfiguration
 		for (vector<ScaleSet *>::const_iterator it = m_scaleSet.cbegin();
 					it != m_scaleSet.cend(); it++)
 		{
 			(*it)->apply(*reading);
 		}
 	}
+}
+
+/**
+ * Reconfigure the filter. We must hold the mutex here to stop the ingest
+ * as we manipulate the m_scaleSet vector when recreating the scale sets
+ *
+ * @param conf		The new configuration to apply
+ */
+void ScaleSetFilter::reconfigure(const string& conf)
+{
+	lock_guard<mutex> guard(m_configMutex);
+	setConfig(conf);
+	for (auto it = m_scaleSet.cbegin(); it != m_scaleSet.cend(); it++)
+		delete *it;
+	m_scaleSet.clear();
+	handleConfig(m_config);
 }
 
 /**
@@ -90,8 +107,16 @@ Document	doc;
 						datapoint = (*it)["datapoint"].GetString();
 					if (it->HasMember("scale") && (*it)["scale"].IsFloat())
 						scale = (*it)["scale"].GetFloat();
-					if (it->HasMember("offset"))
+					else if (it->HasMember("scale") && (*it)["scale"].IsInt())
+						scale = (*it)["scale"].GetInt();
+					else if (it->HasMember("scale"))
+						Logger::getLogger()->error("Scale property for asset %s, %s shoud be a numeric value", asset.c_str(), datapoint.c_str());
+					if (it->HasMember("offset") && (*it)["offset"].IsFloat())
 						offset = (*it)["offset"].GetFloat();
+					else if (it->HasMember("offset") && (*it)["offset"].IsInt())
+						offset = (*it)["offset"].GetInt();
+					else if (it->HasMember("scale"))
+						Logger::getLogger()->error("Offset property for asset %s, %s shoud be a numeric value", asset.c_str(), datapoint.c_str());
 					m_scaleSet.push_back(new ScaleSet(asset, datapoint, scale, offset));
 				}
 			}
