@@ -1,5 +1,5 @@
 /*
- * FogLAMP "scale-set" filter plugin.
+ * Fledge "scale-set" filter plugin.
  *
  * Copyright (c) 2018 Dianomic Systems
  *

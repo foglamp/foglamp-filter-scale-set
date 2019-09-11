@@ -1,7 +1,7 @@
 #ifndef _SCALE_SET_FILTER_H
 #define _SCALE_SET_FILTER_H
 /*
- * FogLAMP "RMS" filter plugin.
+ * Fledge "RMS" filter plugin.
  *
  * Copyright (c) 2018 Dianomic Systems
  *
@@ -18,11 +18,11 @@
 #include <mutex>
 
 /**
- * A FogLAMP filter that can apply a set of different scale and offset
+ * A Fledge filter that can apply a set of different scale and offset
  * values to a readings set. Different scale factors can be applied to
  * each asset and/or datapoint within the asset.
  */
-class ScaleSetFilter : public FogLampFilter {
+class ScaleSetFilter : public FledgeFilter {
 	public:
 		ScaleSetFilter(const std::string& filterName,
                         ConfigCategory& filterConfig,
